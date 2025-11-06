@@ -1,8 +1,10 @@
-﻿using Spectre.Console;
-using Core;
+﻿using Core;
+using DAL.Models;
+using JonasTodoConsole.TuiView.ANSI;
 using JonasTodoConsole.TuiView.Console;
-using JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console;
 using JonasTodoConsole.TuiView.TableViewer;
+using Microsoft.EntityFrameworkCore;
+using Spectre.Console;
 
 namespace JonasTodoConsole.TuiView
 {
@@ -10,11 +12,15 @@ namespace JonasTodoConsole.TuiView
     {
         private readonly IConsoleTablePresenter _tablePresenter;
         private readonly ISelectTable _selectTable;
+        private readonly IDbContextFactory<LearningDbContext> _dbFactory;
 
-        public ConsoleMenu(IConsoleTablePresenter tablePresenter, ISelectTable selectTable)
+        public ConsoleMenu(IConsoleTablePresenter tablePresenter,
+            ISelectTable selectTable,
+            IDbContextFactory<LearningDbContext> dbFactory)
         {
             _tablePresenter = tablePresenter;
             _selectTable = selectTable;
+            _dbFactory = dbFactory;
         }
 
         internal async Task<int> ShowAsync(CancellationToken stoppingToken)
@@ -30,7 +36,29 @@ namespace JonasTodoConsole.TuiView
 
                 if (tableType == "Ansi Table Viewer")
                 {
-                    var t = await AnsiTableChooser.ChooseTable();
+                    TableEnum t;
+                    do
+                    {
+                        t = await AnsiTableChooser.ChooseTable();
+
+                        switch (t)
+                        {
+                            case TableEnum.Topics:
+                                await new TopicsTable(_dbFactory).RunAsync();
+                                break;
+                            case TableEnum.Subtopics:
+                                await new SubtopicsTable(_dbFactory).RunAsync();
+                                break;
+                            case TableEnum.UnfinishedSubtopics:
+                                AnsiConsole.WriteException(new Exception("Not implemented yet"));
+                                break;
+                            case TableEnum.TopicsAndSubtopics:
+                                AnsiConsole.WriteException(new Exception("Not implemented yet"));
+                                break;
+                            default:
+                                return -1;
+                        }
+                    } while (t != TableEnum.Exit); // Loop until user chooses to exit
                     return 0;
                 }
                 else
@@ -40,18 +68,18 @@ namespace JonasTodoConsole.TuiView
                     var prompt = AnsiConsole.Prompt(new SelectionPrompt<TableEnum>()
                 .Title("Choose data to view")
                 .PageSize(10)
-                .AddChoices([TableEnum.SelectTopics, TableEnum.SelectSubtopics, TableEnum.SelectUnfinishedSubtopics,
-                    TableEnum.SelectTopicsAndSubtopics, TableEnum.Exit]));
+                .AddChoices([TableEnum.Topics, TableEnum.Subtopics, TableEnum.UnfinishedSubtopics,
+                    TableEnum.TopicsAndSubtopics, TableEnum.Exit]));
 
                     switch (prompt)
                     {
-                        case TableEnum.SelectTopics:
+                        case TableEnum.Topics:
                             _tablePresenter.PresentTable(_selectTable.SelectAllTopics());
                             break;
-                        case TableEnum.SelectSubtopics:
+                        case TableEnum.Subtopics:
                             _tablePresenter.PresentTable(_selectTable.SelectAllSubtopics());
                             break;
-                        case TableEnum.SelectTopicsAndSubtopics:
+                        case TableEnum.TopicsAndSubtopics:
                             _tablePresenter.PresentTable(_selectTable.SelectUnfinishedSubtopics()
                                 .OrderByDescending(t => t.Priority)
                                 .ThenByDescending(t => t.EstimatedHours));

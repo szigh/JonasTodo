@@ -1,5 +1,4 @@
-﻿using JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace JonasTodoConsole.TuiView.TableViewer
 {
@@ -11,21 +10,18 @@ namespace JonasTodoConsole.TuiView.TableViewer
         public static async Task<TableEnum> ChooseTable()
         {
             Extensions.H3("ANSI Table Chooser - Choose a table");
-            
+
             return await AnsiConsole.PromptAsync(
                 new SelectionPrompt<TableEnum>()
-                    .Title("Choose data to view")
                     .PageSize(10)
                     .AddChoices(new[]
                     {
-                        TableEnum.SelectTopics,
-                        TableEnum.SelectSubtopics,
-                        TableEnum.SelectUnfinishedSubtopics,
-                        TableEnum.SelectTopicsAndSubtopics,
+                        TableEnum.Topics,
+                        TableEnum.Subtopics,
+                        TableEnum.UnfinishedSubtopics,
+                        //TableEnum.TopicsAndSubtopics,
                         TableEnum.Exit
-                    })
-            );
-
+                    }));
         }
     }
 }

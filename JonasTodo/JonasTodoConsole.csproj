@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="TuiView\ANSI\TableViewer\Spectre.Console\AnsiTableChooser.cs" />
+    <None Include="TuiView\ANSI\AnsiTableChooser.cs" />
   </ItemGroup>
 
   <ItemGroup>
