@@ -1,4 +1,6 @@
-﻿namespace JonasTodoConsole.TuiView.TableViewer.Spectre.Console
+﻿using JonasTodoConsole.TuiView.Console;
+
+namespace JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console
 {
     public class AnsiTablePresenter : IConsoleTablePresenter
     {

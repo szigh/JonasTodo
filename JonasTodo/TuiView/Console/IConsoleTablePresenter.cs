@@ -1,4 +1,4 @@
-﻿namespace JonasTodoConsole.TuiView.TableViewer
+﻿namespace JonasTodoConsole.TuiView.Console
 {
     public interface IConsoleTablePresenter
     {

@@ -1,4 +1,4 @@
-﻿namespace JonasTodoConsole.TuiView.TableViewer.Spectre.Console
+﻿namespace JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console
 {
     internal interface IUpdate
     {

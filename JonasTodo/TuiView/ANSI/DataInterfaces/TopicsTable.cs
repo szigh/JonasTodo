@@ -1,10 +1,10 @@
 ﻿using DAL.Models;
-using JonasTodoConsole.TuiView.TableViewer.Spectre.Console;
+using JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using System.Text;
 
-namespace JonasTodoConsole.TuiView.DataInterfaces
+namespace JonasTodoConsole.TuiView.ANSI.DataInterfaces
 {
     internal class TopicsTable : IRead, IUpdate, ITopicsTable
     {

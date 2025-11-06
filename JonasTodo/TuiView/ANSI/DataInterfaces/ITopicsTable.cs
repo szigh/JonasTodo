@@ -1,4 +1,4 @@
-﻿namespace JonasTodoConsole.TuiView.DataInterfaces
+﻿namespace JonasTodoConsole.TuiView.ANSI.DataInterfaces
 {
     internal interface ITopicsTable
     {

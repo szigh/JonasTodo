@@ -1,24 +1,23 @@
 ﻿using Spectre.Console;
-using JonasTodoConsole.TuiView.TableViewer;
 using Core;
-using JonasTodoConsole.TuiView.TableViewer.Spectre.Console;
+using JonasTodoConsole.TuiView.Console;
+using JonasTodoConsole.TuiView.ANSI.TableViewer.Spectre.Console;
+using JonasTodoConsole.TuiView.TableViewer;
 
 namespace JonasTodoConsole.TuiView
 {
     internal class ConsoleMenu
     {
         private readonly IConsoleTablePresenter _tablePresenter;
-        private readonly IAnsiTableChooser ansiTableChooser;
         private readonly ISelectTable _selectTable;
 
-        public ConsoleMenu(IConsoleTablePresenter tablePresenter, IAnsiTableChooser ansiTableChooser, ISelectTable selectTable)
+        public ConsoleMenu(IConsoleTablePresenter tablePresenter, ISelectTable selectTable)
         {
             _tablePresenter = tablePresenter;
-            this.ansiTableChooser = ansiTableChooser;
             _selectTable = selectTable;
         }
 
-        internal int Show()
+        internal async Task<int> ShowAsync(CancellationToken stoppingToken)
         {
             try
             {
@@ -31,7 +30,7 @@ namespace JonasTodoConsole.TuiView
 
                 if (tableType == "Ansi Table Viewer")
                 {
-
+                    var t = await AnsiTableChooser.ChooseTable();
                     return 0;
                 }
                 else
@@ -66,7 +65,8 @@ namespace JonasTodoConsole.TuiView
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //Console.WriteLine(e);
+                //SUB(11) add logger
                 return -1;
             }
         }
