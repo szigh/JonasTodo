@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using JonasTodo.Models;
+using DAL.Models;
 using DAL;
 using JonasTodoConsole.TuiView;
 using JonasTodoConsole.TuiView.TableViewer;

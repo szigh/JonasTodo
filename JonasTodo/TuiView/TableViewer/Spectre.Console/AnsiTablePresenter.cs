@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JonasTodoConsole.TuiView.TableViewer.Spectre.Console
+﻿namespace JonasTodoConsole.TuiView.TableViewer.Spectre.Console
 {
     public class AnsiTablePresenter : IConsoleTablePresenter
     {

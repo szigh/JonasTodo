@@ -19,6 +19,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
+		<PackageReference Include="Spectre.Console.Json" Version="0.53.0" />
 	</ItemGroup>
 
 </Project>

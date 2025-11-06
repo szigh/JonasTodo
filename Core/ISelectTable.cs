@@ -8,6 +8,5 @@ namespace Core
         IEnumerable<Topic> SelectAllTopics();
         IEnumerable<Subtopic> SelectAllSubtopics();
         IEnumerable<Subtopic> SelectUnfinishedSubtopics();
-        Task<IEnumerable<SubtopicWithTopicDTO>> GetJoinedSubtopicsWithTopics();
     }
 }

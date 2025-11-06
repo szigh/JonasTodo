@@ -1,7 +1,4 @@
-﻿using DAL;
-using JonasTodo.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Core
 {
