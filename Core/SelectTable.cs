@@ -8,28 +8,28 @@ namespace Core
         public IEnumerable<Job> SelectAllJobs()
         {
             using var scope = serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ToDoContext>();
             return [.. dbContext.Jobs];
         }
 
         public IEnumerable<Subtopic> SelectAllSubtopics()
         {
             using var scope = serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ToDoContext>();
             return [.. dbContext.Subtopics];
         }
 
         public IEnumerable<Topic> SelectAllTopics()
         {
             using var scope = serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ToDoContext>();
             return [.. dbContext.Topics];
         }
 
         public IEnumerable<Subtopic> SelectUnfinishedSubtopics()
         {
             using var scope = serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ToDoContext>();
             return [.. dbContext.Subtopics.Where(subtopic => !(subtopic.Completed ?? false))];
         }
 

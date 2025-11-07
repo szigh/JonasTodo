@@ -12,11 +12,11 @@ namespace JonasTodoConsole.TuiView
     {
         private readonly IConsoleTablePresenter _tablePresenter;
         private readonly ISelectTable _selectTable;
-        private readonly IDbContextFactory<LearningDbContext> _dbFactory;
+        private readonly IDbContextFactory<ToDoContext> _dbFactory;
 
         public ConsoleMenu(IConsoleTablePresenter tablePresenter,
             ISelectTable selectTable,
-            IDbContextFactory<LearningDbContext> dbFactory)
+            IDbContextFactory<ToDoContext> dbFactory)
         {
             _tablePresenter = tablePresenter;
             _selectTable = selectTable;
@@ -33,6 +33,8 @@ namespace JonasTodoConsole.TuiView
                     .Title("Choose table type")
                     .PageSize(10)
                     .AddChoices(new[] { "Ansi Table Viewer", "Simple Console Table Viewer" }));
+
+                
 
                 if (tableType == "Ansi Table Viewer")
                 {
@@ -63,6 +65,7 @@ namespace JonasTodoConsole.TuiView
                 }
                 else
                 {
+
                     Extensions.H3("Raw console table viewer");
 
                     var prompt = AnsiConsole.Prompt(new SelectionPrompt<TableEnum>()

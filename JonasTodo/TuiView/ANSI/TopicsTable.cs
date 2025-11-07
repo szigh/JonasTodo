@@ -7,9 +7,9 @@ namespace JonasTodoConsole.TuiView.ANSI
 {
     public class TopicsTable
     {
-        private readonly IDbContextFactory<LearningDbContext> _dbFactory;
+        private readonly IDbContextFactory<ToDoContext> _dbFactory;
 
-        public TopicsTable(IDbContextFactory<LearningDbContext> dbFactory)
+        public TopicsTable(IDbContextFactory<ToDoContext> dbFactory)
         {
             _dbFactory = dbFactory;
         }
@@ -24,34 +24,38 @@ namespace JonasTodoConsole.TuiView.ANSI
   |_|\___/| .__/|_|\___|___/
           |_|               [/]" + Environment.NewLine);
 
-            using LearningDbContext dbContext = await WriteTable();
+            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync();
             AnsiConsole.WriteLine();
-            
-            AnsiConsole.Prompt(new TextPrompt<string>("Press [green]ENTER[/] to return to the main menu"));
+
+            await WriteTable(dbContext);
+
+            AnsiConsole.MarkupLine("Press [green]ENTER[/] to return to the main menu");
+            System.Console.ReadKey();
         }
 
-        private async Task<LearningDbContext> WriteTable()
+        private async Task WriteTable(ToDoContext dbContext)
         {
-            var dbContext = _dbFactory.CreateDbContext();
             var topics = await dbContext.Topics.ToListAsync();
-            var table = new Table();
-            table.AddColumn("ID");
-            table.AddColumn("Logged");
-            table.AddColumn("Description");
-            table.AddColumn("Long Description");
-            table.AddColumn("Priority");
+            var table = new Table()
+                .ShowRowSeparators()
+                .HeavyHeadBorder()
+                .AddColumn("ID")
+                .AddColumn("Logged")
+                .AddColumn("Description")
+                .AddColumn("Long Description")
+                .AddColumn("Priority");
             foreach (var topic in topics)
             {
-                string priorityStars = GetStars(topic.Priority ?? 0);
+                string priorityStars = GetStars(topic.Priority ?? 0, Emoji);
                 table.AddRow(
-                    MarkupCell(topic.Id.ToString()),
-                    MarkupCell(topic.DateLogged?.ToString("yyyy-MM-dd")),
-                    MarkupCell(topic.Description),
-                    MarkupCell(topic.LongDescriptions),
+                    MarkupNullableCell(topic.Id.ToString()),
+                    MarkupNullableCell(topic.DateLogged?.ToString("yyyy-MM-dd")),
+                    MarkupNullableCell(topic.Description),
+                    MarkupNullableCell(topic.LongDescriptions),
                     new Markup(priorityStars, new Style(foreground: Color.Yellow)));
             }
             AnsiConsole.Write(table);
-            return dbContext;
+            return;
         }
     }
 }

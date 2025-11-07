@@ -14,19 +14,24 @@ namespace JonasTodoConsole
 
         internal static string GetStars(int number)
         {
+            const string starEmoji = "*";
+
+            //unknown why this doesn't work 
+            //const string starEmoji = Emoji.Known.Star;
+
             var priorityStars = string.Empty;
             if (number > 0)
             {
                 for (int i = 0; i < number; i++)
                 {
-                    priorityStars += Emoji.Known.Star;
+                    priorityStars += starEmoji;
                 }
             }
 
             return priorityStars;
         }
 
-        internal static Markup MarkupCell(string? content)
+        internal static Markup MarkupNullableCell(string? content)
         {
             if (content != null)
                 return new Markup(content);
