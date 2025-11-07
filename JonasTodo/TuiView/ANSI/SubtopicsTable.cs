@@ -1,6 +1,5 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
