@@ -30,7 +30,7 @@ await Host.CreateDefaultBuilder(args)
     {
         // Using Azure KeyVault to manage secrets (connection strings)
         services.AddKeyVaultSecretHelper(context.Configuration["KeyVault:Endpoint"]!);
-        services.AddDbContextFactory<LearningDbContext>(
+        services.AddDbContextFactory<ToDoContext>(
             options => options.UseSqlServer(context.Configuration.GetConnectionString("ToDoApp")));
         services.Configure<DALSettings>(context.Configuration.GetSection(nameof(DALSettings)));
 

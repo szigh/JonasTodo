@@ -7,9 +7,9 @@ namespace JonasTodoConsole.TuiView.ANSI
 {
     public class SubtopicsTable
     {
-        private readonly IDbContextFactory<LearningDbContext> _dbFactory;
+        private readonly IDbContextFactory<ToDoContext> _dbFactory;
 
-        public SubtopicsTable(IDbContextFactory<LearningDbContext> dbFactory)
+        public SubtopicsTable(IDbContextFactory<ToDoContext> dbFactory)
         {
             _dbFactory = dbFactory;
         }
@@ -26,41 +26,46 @@ namespace JonasTodoConsole.TuiView.ANSI
 |____/ \__,_|_.__/ \__\___/| .__/|_|\___|___/
                            |_|               [/]" + Environment.NewLine);
 
-            using LearningDbContext dbContext = await WriteTable();
+            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync();
             AnsiConsole.WriteLine();
+
+            await WriteTable(dbContext);
+
+            AnsiConsole.WriteLine("Press [green]ENTER[/] to return to the main menu");
+            System.Console.ReadKey();
         }
 
-        private async Task<LearningDbContext> WriteTable()
+        private async Task WriteTable(ToDoContext dbContext)
         {
-            var dbContext = _dbFactory.CreateDbContext();
             var subtopics = await dbContext.Subtopics.ToListAsync();
             var topics = await dbContext.Topics.ToListAsync();
-            var table = new Table();
-            table.AddColumn("ID");
-            table.AddColumn("Logged");
-            table.AddColumn("Description");
-            table.AddColumn("Long Description");
-            table.AddColumn("Topic");
-            table.AddColumn("Estimated hours");
-            table.AddColumn("Completed");
-            table.AddColumn("Priority");
+            var table = new Table()
+                .Border(TableBorder.DoubleEdge)
+                .ShowRowSeparators()
+                .MinimalHeavyHeadBorder()
+                .AddColumn("ID")
+                .AddColumn("Logged")
+                .AddColumn("Description")
+                .AddColumn("Long Description")
+                .AddColumn("Topic")
+                .AddColumn("Hrs")
+                .AddColumn("Completed")
+                .AddColumn("Priority");
             foreach (var subtopic in subtopics)
             {
                 string priorityStars = GetStars(subtopic.Priority ?? 0);
                 table.AddRow(
-                    MarkupCell(subtopic.Id.ToString()),
-                    MarkupCell(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
-                    MarkupCell(subtopic.Description ?? "N/A"),
-                    MarkupCell(subtopic.LongDescription ?? "N/A"),
-                    MarkupCell(topics.FirstOrDefault(
-                        t => t != null && t.Id == subtopic.TopicId)?.Description ?? "N/A"),
-                    MarkupCell(subtopic.EstimatedHours.ToString() ?? "N/A"),
-                    MarkupCell(subtopic.Priority.ToString() ?? "N/A"),
+                    MarkupNullableCell(subtopic.Id.ToString()),
+                    MarkupNullableCell(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
+                    MarkupNullableCell(subtopic.Description ?? "N/A"),
+                    MarkupNullableCell(subtopic.LongDescription ?? "N/A"),
+                    MarkupNullableCell(subtopic.Topic?.Description ?? "N/A"),
+                    MarkupNullableCell(subtopic.EstimatedHours.ToString() ?? "N/A"),
+                    MarkupNullableCell(subtopic.Completed == true ? "True" : "False"),
                     new Markup(priorityStars, new Style(foreground: Color.Yellow)));
                 
             }
             AnsiConsole.Write(table);
-            return dbContext;
         }
     }
 }
