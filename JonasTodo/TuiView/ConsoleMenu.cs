@@ -64,7 +64,6 @@ namespace JonasTodoConsole.TuiView
                 }
                 else
                 {
-
                     Extensions.H3("Raw console table viewer");
 
                     var prompt = AnsiConsole.Prompt(new SelectionPrompt<TableEnum>()
