@@ -62,7 +62,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                     MarkupNullableCell(subtopic.LongDescription ?? "N/A"),
                     MarkupNullableCell(subtopic.Topic?.Description ?? "N/A"),
                     MarkupNullableCell(subtopic.EstimatedHours.ToString() ?? "N/A"),
-                    MarkupNullableCell(subtopic.Completed == false || subtopic.Completed == null ? "N/A" : "False"),
+                    MarkupNullableCell(subtopic.Completed == true ? "True" : "False"),
                     new Markup(priorityStars, new Style(foreground: Color.Yellow)));
                 
             }
