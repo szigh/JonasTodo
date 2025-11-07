@@ -57,4 +57,11 @@ public partial class Job
 
     [Column(TypeName = "text")]
     public string Info { get; set; }
+
+    [Column("CompanyID")]
+    public int? CompanyId { get; set; }
+
+    [ForeignKey("CompanyId")]
+    [InverseProperty("Jobs")]
+    public virtual Company CompanyNavigation { get; set; }
 }

@@ -46,7 +46,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                 .AddColumn("Priority");
             foreach (var topic in topics)
             {
-                string priorityStars = GetStars(topic.Priority ?? 0, Emoji);
+                string priorityStars = GetStars(topic.Priority ?? 0);
                 table.AddRow(
                     MarkupNullableCell(topic.Id.ToString()),
                     MarkupNullableCell(topic.DateLogged?.ToString("yyyy-MM-dd")),
@@ -55,6 +55,8 @@ namespace JonasTodoConsole.TuiView.ANSI
                     new Markup(priorityStars, new Style(foreground: Color.Yellow)));
             }
             AnsiConsole.Write(table);
+            AnsiConsole.WriteLine();
+
             return;
         }
     }

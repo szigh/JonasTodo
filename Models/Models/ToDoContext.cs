@@ -14,6 +14,8 @@ public partial class ToDoContext : DbContext
     {
     }
 
+    public virtual DbSet<Company> Companies { get; set; }
+
     public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<Subtopic> Subtopics { get; set; }
@@ -24,6 +26,7 @@ public partial class ToDoContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfiguration(new Configurations.JobConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.SubtopicConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.TopicConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.UnfinishedJobConfiguration());
