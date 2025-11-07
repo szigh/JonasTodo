@@ -13,6 +13,7 @@ namespace DAL.Models
 {
     public partial interface IToDoContextProcedures
     {
-        Task<List<GetSubtopicsResult>> GetSubtopicsAsync(int? Topic_ID, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<GetSubtopicsResult>> GetSubtopicsAsync(int? Topic_ID, OutputParameter<int> returnValue = null, 
+            CancellationToken cancellationToken = default);
     }
 }
