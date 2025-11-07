@@ -1,6 +1,5 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
@@ -54,7 +53,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                 .AddColumn("Priority");
             foreach (var subtopic in subtopics)
             {
-                string priorityStars = GetStars(subtopic.Priority ?? 0, Emoji);
+                string priorityStars = GetStars(subtopic.Priority ?? 0);
                 table.AddRow(
                     MarkupNullableCell(subtopic.Id.ToString()),
                     MarkupNullableCell(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
@@ -62,12 +61,11 @@ namespace JonasTodoConsole.TuiView.ANSI
                     MarkupNullableCell(subtopic.LongDescription ?? "N/A"),
                     MarkupNullableCell(subtopic.Topic?.Description ?? "N/A"),
                     MarkupNullableCell(subtopic.EstimatedHours.ToString() ?? "N/A"),
-                    MarkupNullableCell(subtopic.Completed == false || subtopic.Completed == null ? "N/A" : "False"),
+                    MarkupNullableCell(subtopic.Completed == true ? "True" : "False"),
                     new Markup(priorityStars, new Style(foreground: Color.Yellow)));
                 
             }
             AnsiConsole.Write(table);
-            return;
         }
     }
 }

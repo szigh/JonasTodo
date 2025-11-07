@@ -39,7 +39,7 @@ namespace DAL.Models
     {
         private bool _valueSet = false;
 
-        public TValue _value;
+        private TValue _value;
 
         public TValue Value
         {
