@@ -67,7 +67,6 @@ namespace JonasTodoConsole.TuiView.ANSI
                 
             }
             AnsiConsole.Write(table);
-            return;
         }
     }
 }
