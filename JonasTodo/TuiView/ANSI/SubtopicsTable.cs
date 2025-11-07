@@ -54,7 +54,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                 .AddColumn("Priority");
             foreach (var subtopic in subtopics)
             {
-                string priorityStars = GetStars(subtopic.Priority ?? 0, Emoji);
+                string priorityStars = GetStars(subtopic.Priority ?? 0);
                 table.AddRow(
                     MarkupNullableCell(subtopic.Id.ToString()),
                     MarkupNullableCell(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
