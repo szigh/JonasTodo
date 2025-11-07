@@ -1,0 +1,18 @@
+{
+  "profiles": {
+    "Develop": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "CONSOLE_LOG_LEVEL": "Debug"
+      }
+    },
+    "Release": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Production",
+        "CONSOLE_LOG_LEVEL": "Information"
+      }
+    }
+  }
+}

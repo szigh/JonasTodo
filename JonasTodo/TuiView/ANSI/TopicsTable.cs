@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
+using static JonasTodoConsole.Extensions;
 
 namespace JonasTodoConsole.TuiView.ANSI
 {
@@ -41,31 +42,16 @@ namespace JonasTodoConsole.TuiView.ANSI
             table.AddColumn("Priority");
             foreach (var topic in topics)
             {
-                string priorityStars = GetStars(topic);
+                string priorityStars = GetStars(topic.Priority ?? 0);
                 table.AddRow(
-                    new Markup(topic.Id.ToString()),
-                    new Markup(topic.DateLogged?.ToString("yyyy-MM-dd") ?? "N/A"),
-                    new Markup(topic.Description ?? "N/A"),
-                    new Markup(topic.LongDescriptions ?? "N/A"),
-                    new Markup(priorityStars, new Style(foreground: Color.Yellow)))
-                ;
+                    MarkupCell(topic.Id.ToString()),
+                    MarkupCell(topic.DateLogged?.ToString("yyyy-MM-dd")),
+                    MarkupCell(topic.Description),
+                    MarkupCell(topic.LongDescriptions),
+                    new Markup(priorityStars, new Style(foreground: Color.Yellow)));
             }
             AnsiConsole.Write(table);
             return dbContext;
-        }
-
-        private static string GetStars(Topic topic)
-        {
-            var priorityStars = string.Empty;
-            if (topic.Priority != null)
-            {
-                for (int i = 0; i < topic.Priority; i++)
-                {
-                    priorityStars += "[yellow]:star:[/]";
-                }
-            }
-
-            return priorityStars;
         }
     }
 }
