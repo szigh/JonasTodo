@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using Azure.Core;
+using Azure.Identity;
 using Core;
 using DAL;
 using DAL.Models;
@@ -6,7 +7,6 @@ using JonasTodoConsole;
 using JonasTodoConsole.TuiView;
 using JonasTodoConsole.TuiView.Console;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,15 +18,20 @@ await Host.CreateDefaultBuilder(args)
         var kvEndpoint = built["KeyVault:Endpoint"];
         if (!string.IsNullOrWhiteSpace(kvEndpoint))
         {
-            config.AddAzureKeyVault(new Uri(kvEndpoint), new DefaultAzureCredential());
+            TokenCredential credential;
+            if (context.HostingEnvironment.IsDevelopment())
+                credential = new InteractiveBrowserCredential();
+            else 
+                credential = new DefaultAzureCredential();
+            config.AddAzureKeyVault(new Uri(kvEndpoint), credential);
         }
     })
     .ConfigureServices((context, services) =>
     {
+        // Using Azure KeyVault to manage secrets (connection strings)
         services.AddKeyVaultSecretHelper(context.Configuration["KeyVault:Endpoint"]!);
-        var conn = context.Configuration.GetConnectionString("ToDoApp");
-        Console.WriteLine(conn);
-        services.AddDbContextFactory<LearningDbContext>(options => options.UseSqlServer(conn));
+        services.AddDbContextFactory<LearningDbContext>(
+            options => options.UseSqlServer(context.Configuration.GetConnectionString("ToDoApp")));
         services.Configure<DALSettings>(context.Configuration.GetSection(nameof(DALSettings)));
 
         services.AddDALServices();

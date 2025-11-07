@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
+using static JonasTodoConsole.Extensions;
 
 namespace JonasTodoConsole.TuiView.ANSI
 {
@@ -45,35 +46,21 @@ namespace JonasTodoConsole.TuiView.ANSI
             table.AddColumn("Priority");
             foreach (var subtopic in subtopics)
             {
-                string priorityStars = GetStars(subtopic);
+                string priorityStars = GetStars(subtopic.Priority ?? 0);
                 table.AddRow(
-                    new Markup(subtopic.Id.ToString()),
-                    new Markup(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
-                    new Markup(subtopic.Description ?? "N/A"),
-                    new Markup(subtopic.LongDescription ?? "N/A"),
-                    new Markup(topics.FirstOrDefault(
+                    MarkupCell(subtopic.Id.ToString()),
+                    MarkupCell(subtopic.LoggedDate?.ToString("yyyy-MM-dd") ?? "N/A"),
+                    MarkupCell(subtopic.Description ?? "N/A"),
+                    MarkupCell(subtopic.LongDescription ?? "N/A"),
+                    MarkupCell(topics.FirstOrDefault(
                         t => t != null && t.Id == subtopic.TopicId)?.Description ?? "N/A"),
-                    new Markup(subtopic.EstimatedHours.ToString() ?? "N/A"),
-                    new Markup(subtopic.Priority.ToString() ?? "N/A"),
-                    new Markup(priorityStars, new Style(foreground: Color.Yellow)))
-                ;
+                    MarkupCell(subtopic.EstimatedHours.ToString() ?? "N/A"),
+                    MarkupCell(subtopic.Priority.ToString() ?? "N/A"),
+                    new Markup(priorityStars, new Style(foreground: Color.Yellow)));
+                
             }
             AnsiConsole.Write(table);
             return dbContext;
-        }
-
-        private static string GetStars(Subtopic topic)
-        {
-            var priorityStars = string.Empty;
-            if (topic.Priority != null)
-            {
-                for (int i = 0; i < topic.Priority; i++)
-                {
-                    priorityStars += "[yellow]:star:[/]";
-                }
-            }
-
-            return priorityStars;
         }
     }
 }
