@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 
-namespace JonasTodoConsole.TuiView.TableViewer
+namespace JonasTodoConsole.TuiView.Console
 {
     public class ConsoleTablePresenter : IConsoleTablePresenter
     {
@@ -26,13 +26,15 @@ namespace JonasTodoConsole.TuiView.TableViewer
 
             if (props.Length == 0)
             {
-                Console.WriteLine("(no public properties to display)");
+                //Console.WriteLine("(no public properties to display)");
+                //SUB(11) add logger
                 return;
             }
 
             if (rows.Count == 0)
             {
-                Console.WriteLine("(no rows)");
+                //Console.WriteLine("(no rows)");
+                //SUB(11) add logger
                 return;
             }
 
@@ -53,7 +55,7 @@ namespace JonasTodoConsole.TuiView.TableViewer
             AppendDataRows(sb, props, columnWidths, rows);
             AppendBottomBorder(sb, props, columnWidths);
 
-            Console.Write(sb.ToString());
+            System.Console.Write(sb.ToString());
         }
 
         private static List<T> MaterializeRows<T>(IEnumerable<T> tableData)
@@ -71,7 +73,7 @@ namespace JonasTodoConsole.TuiView.TableViewer
         {
             try
             {
-                return Console.WindowWidth;
+                return System.Console.WindowWidth;
             }
             catch
             {

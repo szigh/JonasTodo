@@ -1,23 +1,16 @@
-﻿using DAL;
-using DAL.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace JonasTodo.Models;
+namespace DAL.Models;
 
 public partial class LearningDbContext : DbContext
 {
-    private readonly IOptions<DALSettings> _dalSettings;
-
-    public LearningDbContext(IOptions<DALSettings> dalSettings)
+    public LearningDbContext()
     {
-        _dalSettings = dalSettings;
     }
 
-    public LearningDbContext(IOptions<DALSettings> dalSettings, DbContextOptions<LearningDbContext> options)
+    public LearningDbContext(DbContextOptions<LearningDbContext> options)
         : base(options)
     {
-        _dalSettings = dalSettings;
     }
 
     public virtual DbSet<Job> Jobs { get; set; }
@@ -26,7 +19,8 @@ public partial class LearningDbContext : DbContext
 
     public virtual DbSet<Topic> Topics { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(_dalSettings.Value.ConnectionString);
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+        => optionsBuilder.UseSqlServer();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

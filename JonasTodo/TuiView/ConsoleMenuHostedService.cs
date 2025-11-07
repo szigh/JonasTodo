@@ -23,17 +23,26 @@ namespace JonasTodoConsole.TuiView
         {
             _logger.LogInformation("Console menu hosted service starting.");
 
-            // Run the blocking menu on a background thread so ExecuteAsync stays responsive to cancellation.
-            var showTask = Task.Run(() => _menu.Show(), stoppingToken);
+            // Start the async menu directly and let it honor the cancellation token.
+            var showTask = _menu.ShowAsync(stoppingToken);
 
             // Wait for either the menu to finish or for cancellation to be requested.
             var finishedTask = await Task.WhenAny(showTask, Task.Delay(Timeout.Infinite, stoppingToken));
 
             if (finishedTask == showTask)
             {
-                // Menu finished normally
-                var exitCode = showTask.Result;
-                _logger.LogInformation("Console menu finished with exit code {ExitCode}", exitCode);
+                try
+                {
+                    var exitCode = await showTask;
+                    _logger.LogInformation("Console menu finished with exit code {ExitCode}", exitCode);
+
+                    Environment.ExitCode = exitCode;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Console menu threw an unhandled exception.");
+                    Environment.ExitCode = -1;
+                }
 
                 // Tell the host to stop
                 _appLifetime.StopApplication();

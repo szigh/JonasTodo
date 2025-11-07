@@ -3,10 +3,10 @@
     public enum TableEnum
     {
         Exit = 0,
-        SelectTopics = 1,
-        SelectSubtopics = 2,
-        SelectUnfinishedSubtopics = 3,
-        SelectTopicsAndSubtopics = 4,
+        Topics = 1,
+        Subtopics = 2,
+        UnfinishedSubtopics = 3,
+        TopicsAndSubtopics = 4,
         AnsiTableViewer = 5
     }
 }

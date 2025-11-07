@@ -1,6 +1,4 @@
 ﻿using DAL.Models;
-using JonasTodo.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core
@@ -35,18 +33,18 @@ namespace Core
             return [.. dbContext.Subtopics.Where(subtopic => !(subtopic.Completed ?? false))];
         }
 
-        public async Task<IEnumerable<SubtopicWithTopicDTO>> GetJoinedSubtopicsWithTopics()
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
-            var dtoResults = await dbContext.Database.SqlQuery<SubtopicWithTopicDTO>( //demonstrating direct use of SQL
-$@"SELECT t.Description AS Topic, s.Description AS Subtopic, s.Long_description AS Description, s.Priority, s.Estimated_hours AS 'EstimatedHours'
-FROM Subtopics s
-RIGHT OUTER JOIN Topics t
-ON s.Topic_ID = t.ID
-WHERE s.Completed = 0
-ORDER BY t.Description, s.Priority DESC;").ToListAsync();
-            return dtoResults;
-        }
+//        public async Task<IEnumerable<SubtopicWithTopicDTO>> GetJoinedSubtopicsWithTopics()
+//        {
+//            using var scope = serviceScopeFactory.CreateScope();
+//            var dbContext = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
+//            var dtoResults = await dbContext.Database.SqlQuery<SubtopicWithTopicDTO>( //demonstrating direct use of SQL
+//$@"SELECT t.Description AS Topic, s.Description AS Subtopic, s.Long_description AS Description, s.Priority, s.Estimated_hours AS 'EstimatedHours'
+//FROM Subtopics s
+//RIGHT OUTER JOIN Topics t
+//ON s.Topic_ID = t.ID
+//WHERE s.Completed = 0
+//ORDER BY t.Description, s.Priority DESC;").ToListAsync();
+//            return dtoResults;
+//        }
     }
 }
