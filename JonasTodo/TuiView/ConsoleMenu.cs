@@ -35,7 +35,6 @@ namespace JonasTodoConsole.TuiView
                     .AddChoices(new[] { "Ansi Table Viewer", "Simple Console Table Viewer" }));
 
                 
-
                 if (tableType == "Ansi Table Viewer")
                 {
                     TableEnum t;
