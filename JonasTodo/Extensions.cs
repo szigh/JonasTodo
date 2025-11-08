@@ -12,6 +12,16 @@ namespace JonasTodoConsole
                 new Style(foreground: Color.Green, decoration: Decoration.Italic)));
         }
 
+        public static bool BooleanPrompt(string prompt, bool defaultValue)
+        {
+            return AnsiConsole.Prompt(
+                            new TextPrompt<bool>(prompt)
+                                .AddChoice(true)
+                                .AddChoice(false)
+                                .DefaultValue(defaultValue)
+                                .WithConverter(choice => choice ? "y" : "n"));
+        }
+
         internal static string GetStars(int number)
         {
             string starEmoji = "*";
