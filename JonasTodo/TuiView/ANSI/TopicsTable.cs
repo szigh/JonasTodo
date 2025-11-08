@@ -43,8 +43,12 @@ namespace JonasTodoConsole.TuiView.ANSI
                 if(choice == "Add topic")
                 {
                     H3("Add new topic", false);
-                    dbContext.Add(await PromptForTopicDetails());
-                    await dbContext.SaveChangesAsync();
+                    Topic entity = await PromptForTopicDetails();
+                    if (entity != null)
+                    {
+                        dbContext.Add(entity);
+                        await dbContext.SaveChangesAsync();
+                    }
                 }
             } while (true);
         }
@@ -71,10 +75,16 @@ namespace JonasTodoConsole.TuiView.ANSI
                 Priority = priority,
                 DateLogged = DateOnly.FromDateTime(DateTime.Now)
             };
-            return topic;
+
+            DisplayTable(new[] { topic });
+            bool confirmation = BooleanPrompt("Confirm addition to table", true);
+            if (confirmation)
+                return topic;
+            else
+                return null;
         }
 
-        private static void DisplayTable(List<Topic> topics)
+        internal static void DisplayTable(IEnumerable<Topic> topics)
         {
             var table = new Table()
                 .ShowRowSeparators()
