@@ -136,10 +136,7 @@ namespace JonasTodoConsole.TuiView.Tables
 
             await DisplayTable([subtopic]);
             bool confirmation = BooleanPrompt("Confirm addition to table", true);
-            if (confirmation)
-                return subtopic;
-            else
-                return null;
+            return confirmation ? subtopic : null;
         }
 
         private async static Task DisplayTable(IEnumerable<Subtopic>? subtopics = default,
