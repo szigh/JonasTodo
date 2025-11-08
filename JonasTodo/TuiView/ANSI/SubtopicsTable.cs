@@ -1,4 +1,4 @@
-﻿using DAL.Models;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
@@ -44,7 +44,7 @@ namespace JonasTodoConsole.TuiView.ANSI
 
                 if (choice == "Add subtopic")
                 {
-                    H3("Add new subtopic", false);
+                    H3("Add new topic", false);
                     var newSubtopic = await PromptForSubtopicDetails(dbContext.Topics);
                     if(newSubtopic != null)
                     {
