@@ -14,10 +14,10 @@ namespace JonasTodoConsole
 
         internal static string GetStars(int number)
         {
-            const string starEmoji = "*";
+            string starEmoji = "*";
 
             //unknown why this doesn't work 
-            //const string starEmoji = Emoji.Known.Star;
+            //starEmoji = Emoji.Known.Star;
 
             var priorityStars = string.Empty;
             if (number > 0)

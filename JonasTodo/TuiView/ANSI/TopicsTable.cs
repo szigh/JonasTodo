@@ -27,30 +27,25 @@ namespace JonasTodoConsole.TuiView.ANSI
             using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync();
             AnsiConsole.WriteLine();
 
-            await WriteTable(dbContext);
-
-            AnsiConsole.MarkupLine("Press [green]ENTER[/] to return to the main menu");
-            System.Console.ReadKey();
-        }
-
-        private async Task WriteTable(ToDoContext dbContext)
-        {
             var topics = await dbContext.Topics.ToListAsync();
-            DisplayTable(topics);
-            AnsiConsole.WriteLine();
-
 
             do
             {
+                DisplayTable(topics);
+                AnsiConsole.WriteLine();
+
                 AnsiConsole.MarkupLine("[green italic]Choose what to do next[/]");
                 var choice = await AnsiConsole.PromptAsync<string>(new SelectionPrompt<string>()
                     .AddChoices(new List<string>() { "Add topic", "Exit" }));
 
                 if (choice == "Exit")
                     return;
-
-                H3("Add new topic", false);
-                topics.Add(await PromptForTopicDetails());
+                if(choice == "Add topic")
+                {
+                    H3("Add new topic", false);
+                    dbContext.Add(await PromptForTopicDetails());
+                    await dbContext.SaveChangesAsync();
+                }
             } while (true);
         }
 
