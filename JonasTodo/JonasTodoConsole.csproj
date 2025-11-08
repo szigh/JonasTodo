@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="TuiView\ANSI\AnsiTableChooser.cs" />
+    <None Include="TuiView\TableChooser.cs" />
   </ItemGroup>
 
   <ItemGroup>

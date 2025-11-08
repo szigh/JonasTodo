@@ -1,20 +1,21 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace JonasTodoConsole.TuiView
 {
     internal class ConsoleMenuHostedService : BackgroundService
     {
-        private readonly ConsoleMenu _menu;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ILogger<ConsoleMenuHostedService> _logger;
 
         public ConsoleMenuHostedService(
-            ConsoleMenu menu,
+            IServiceProvider serviceProvider,
             IHostApplicationLifetime appLifetime,
             ILogger<ConsoleMenuHostedService> logger)
         {
-            _menu = menu ?? throw new ArgumentNullException(nameof(menu));
+            _serviceProvider = serviceProvider;
             _appLifetime = appLifetime ?? throw new ArgumentNullException(nameof(appLifetime));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -23,8 +24,9 @@ namespace JonasTodoConsole.TuiView
         {
             _logger.LogInformation("Console menu hosted service starting.");
 
-            // Start the async menu directly and let it honor the cancellation token.
-            var showTask = _menu.ShowAsync(stoppingToken);
+            using var scope = _serviceProvider.CreateScope();
+            var menu = scope.ServiceProvider.GetRequiredService<ConsoleMenu>();
+            var showTask = menu.ShowAsync(stoppingToken);
 
             // Wait for either the menu to finish or for cancellation to be requested.
             var finishedTask = await Task.WhenAny(showTask, Task.Delay(Timeout.Infinite, stoppingToken));

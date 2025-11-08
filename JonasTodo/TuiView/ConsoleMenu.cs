@@ -1,5 +1,5 @@
 ﻿using DAL.Models;
-using JonasTodoConsole.TuiView.ANSI;
+using JonasTodoConsole.TuiView.Tables;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
@@ -8,10 +8,16 @@ namespace JonasTodoConsole.TuiView
     internal class ConsoleMenu
     {
         private readonly IDbContextFactory<ToDoContext> _dbFactory;
+        private readonly ISubtopicsTable _subtopicsTable;
+        private readonly ITopicsTable _topicsTable;
 
-        public ConsoleMenu(IDbContextFactory<ToDoContext> dbFactory)
+        public ConsoleMenu(IDbContextFactory<ToDoContext> dbFactory,
+            ISubtopicsTable subtopicsTable,
+            ITopicsTable topicsTable)
         {
             _dbFactory = dbFactory;
+            _subtopicsTable = subtopicsTable;
+            _topicsTable = topicsTable;
         }
 
         internal async Task<int> ShowAsync(CancellationToken stoppingToken)
@@ -26,10 +32,10 @@ namespace JonasTodoConsole.TuiView
                     switch (t)
                     {
                         case TableEnum.Topics:
-                            await new TopicsTable(_dbFactory).RunAsync(stoppingToken);
+                            await _topicsTable.RunAsync(stoppingToken);
                             break;
                         case TableEnum.Subtopics:
-                            await new SubtopicsTable(_dbFactory).RunAsync(stoppingToken);
+                            await _subtopicsTable.RunAsync(stoppingToken);
                             break;
                         default:
                             return -1;
@@ -39,8 +45,7 @@ namespace JonasTodoConsole.TuiView
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e);
-                //SUB(11) add logger
+                AnsiConsole.WriteException(e, ExceptionFormats.ShortenPaths | ExceptionFormats.ShowLinks);
                 return -1;
             }
         }

@@ -5,7 +5,7 @@ using static JonasTodoConsole.Extensions;
 
 namespace JonasTodoConsole.TuiView.Tables
 {
-    public class TopicsTable
+    public class TopicsTable : ITopicsTable
     {
         private readonly IDbContextFactory<ToDoContext> _dbFactory;
 
@@ -40,7 +40,7 @@ namespace JonasTodoConsole.TuiView.Tables
 
                 if (choice == "Exit")
                     return;
-                if(choice == "Add topic")
+                if (choice == "Add topic")
                 {
                     H3("Add new topic", false);
                     Topic entity = await PromptForTopicDetailsAsync(ct);
@@ -53,7 +53,7 @@ namespace JonasTodoConsole.TuiView.Tables
             } while (true);
         }
 
-        private static async Task<Topic> PromptForTopicDetailsAsync(CancellationToken ct = default)
+        private static async Task<Topic?> PromptForTopicDetailsAsync(CancellationToken ct = default)
         {
             var description = await AnsiConsole.PromptAsync(new TextPrompt<string>("Description:").Validate(s =>
             {

@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DAL.Caches;
+using DAL.Models;
+using DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DAL.Models;
 
 namespace DAL
 {
@@ -9,9 +11,10 @@ namespace DAL
     {
         public static IServiceCollection AddDALServices(this IServiceCollection services)
         {
-            // Register DAL-specific types (repositories, caches, etc.) here, e.g.:
-            // services.AddScoped<IMyRepository, MyRepository>();
-            // (None are present in the current codebase so this is intentionally empty.)
+            services.AddMemoryCache(); 
+            services.AddScoped<ISubtopicRepository, SubtopicRepository>();
+            services.AddScoped<ITopicRepository, TopicRepository>();
+            services.AddSingleton<ISubtopicCache, SubtopicCache>();
             return services;
         }
 
