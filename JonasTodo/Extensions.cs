@@ -1,5 +1,4 @@
-﻿using DAL.Models;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace JonasTodoConsole
 {

@@ -1,12 +1,9 @@
 ﻿using Azure.Core;
 using Azure.Identity;
-using Core;
 using DAL;
-using DAL.Models;
 using JonasTodoConsole;
 using JonasTodoConsole.TuiView;
 using JonasTodoConsole.TuiView.Console;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,12 +27,7 @@ await Host.CreateDefaultBuilder(args)
     {
         // Using Azure KeyVault to manage secrets (connection strings)
         services.AddKeyVaultSecretHelper(context.Configuration["KeyVault:Endpoint"]!);
-        services.AddDbContextFactory<ToDoContext>(
-            options => options.UseSqlServer(context.Configuration.GetConnectionString("ToDoApp")));
-        services.Configure<DALSettings>(context.Configuration.GetSection(nameof(DALSettings)));
-
-        services.AddDALServices();
-        services.AddCoreServices();
+        services.AddDALServices(context.Configuration);
 
         services.AddSingleton<IConsoleTablePresenter, ConsoleTablePresenter>();
         services.AddTransient<ISecretHelper, SecretHelper>();

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
-namespace JonasTodoConsole.TuiView.ANSI
+namespace JonasTodoConsole.TuiView.Tables
 {
     public class TopicsTable
     {
@@ -14,7 +14,7 @@ namespace JonasTodoConsole.TuiView.ANSI
             _dbFactory = dbFactory;
         }
 
-        public async Task RunAsync()
+        public async Task RunAsync(CancellationToken ct = default)
         {
             AnsiConsole.Clear();
             AnsiConsole.MarkupLine(@"[green italic] _____           _          
@@ -24,10 +24,10 @@ namespace JonasTodoConsole.TuiView.ANSI
   |_|\___/| .__/|_|\___|___/
           |_|               [/]" + Environment.NewLine);
 
-            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync();
+            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync(ct);
             AnsiConsole.WriteLine();
 
-            var topics = await dbContext.Topics.ToListAsync();
+            var topics = await dbContext.Topics.ToListAsync(ct);
 
             do
             {
@@ -35,39 +35,39 @@ namespace JonasTodoConsole.TuiView.ANSI
                 AnsiConsole.WriteLine();
 
                 AnsiConsole.MarkupLine("[green italic]Choose what to do next[/]");
-                var choice = await AnsiConsole.PromptAsync<string>(new SelectionPrompt<string>()
-                    .AddChoices(new List<string>() { "Add topic", "Exit" }));
+                var choice = await AnsiConsole.PromptAsync(new SelectionPrompt<string>()
+                    .AddChoices(new List<string>() { "Add topic", "Exit" }), ct);
 
                 if (choice == "Exit")
                     return;
                 if(choice == "Add topic")
                 {
                     H3("Add new topic", false);
-                    Topic entity = await PromptForTopicDetails();
+                    Topic entity = await PromptForTopicDetailsAsync(ct);
                     if (entity != null)
                     {
                         dbContext.Add(entity);
-                        await dbContext.SaveChangesAsync();
+                        await dbContext.SaveChangesAsync(ct);
                     }
                 }
             } while (true);
         }
 
-        private async Task<Topic> PromptForTopicDetails()
+        private static async Task<Topic> PromptForTopicDetailsAsync(CancellationToken ct = default)
         {
-            var description = await AnsiConsole.PromptAsync<string>(new TextPrompt<string>("Description:").Validate(s =>
+            var description = await AnsiConsole.PromptAsync(new TextPrompt<string>("Description:").Validate(s =>
             {
                 return s.Length > 0 && s.Length <= 10
                     ? ValidationResult.Success()
                     : ValidationResult.Error("[red]Description must be between 1 and 10 characters.[/]");
-            }));
-            var longDescription = await AnsiConsole.PromptAsync<string>(new TextPrompt<string>("Long Description:").AllowEmpty());
-            var priority = await AnsiConsole.PromptAsync<int>(new TextPrompt<int>("Priority (1-5):").Validate(p =>
+            }), ct);
+            var longDescription = await AnsiConsole.PromptAsync(new TextPrompt<string>("Long Description:").AllowEmpty(), ct);
+            var priority = await AnsiConsole.PromptAsync(new TextPrompt<int>("Priority (1-5):").Validate(p =>
             {
                 return p >= 1 && p <= 5
                     ? ValidationResult.Success()
                     : ValidationResult.Error("[red]Priority must be between 1 and 5.[/]");
-            }));
+            }), ct);
             var topic = new Topic
             {
                 Description = description,
@@ -76,7 +76,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                 DateLogged = DateOnly.FromDateTime(DateTime.Now)
             };
 
-            DisplayTable(new[] { topic });
+            DisplayTable([topic]);
             bool confirmation = BooleanPrompt("Confirm addition to table", true);
             if (confirmation)
                 return topic;

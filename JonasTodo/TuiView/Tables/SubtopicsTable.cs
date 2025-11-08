@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
-namespace JonasTodoConsole.TuiView.ANSI
+namespace JonasTodoConsole.TuiView.Tables
 {
     public class SubtopicsTable
     {
@@ -14,7 +14,7 @@ namespace JonasTodoConsole.TuiView.ANSI
             _dbFactory = dbFactory;
         }
 
-        public async Task RunAsync()
+        public async Task RunAsync(CancellationToken ct = default)
         {
             AnsiConsole.Clear();
 
@@ -26,18 +26,18 @@ namespace JonasTodoConsole.TuiView.ANSI
 |____/ \__,_|_.__/ \__\___/| .__/|_|\___|___/
                            |_|               [/]" + Environment.NewLine);
 
-            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync();
+            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync(ct);
             AnsiConsole.WriteLine();
 
             do
             {
-                var subtopics = await dbContext.Subtopics.ToListAsync();
+                var subtopics = await dbContext.Subtopics.ToListAsync(cancellationToken: ct);
                 DisplayTable(subtopics.Where(s => s.Completed == false));
                 AnsiConsole.WriteLine();
 
                 AnsiConsole.MarkupLine("[green italic]Choose what to do next[/]");
-                var choice = await AnsiConsole.PromptAsync<string>(new SelectionPrompt<string>()
-                    .AddChoices(new List<string>() { "Add subtopic", "Mark subtopic finished", "Show completed subtopics", "Exit" }));
+                var choice = await AnsiConsole.PromptAsync(new SelectionPrompt<string>()
+                    .AddChoices(new List<string>() { "Add subtopic", "Mark subtopic finished", "Show completed subtopics", "Exit" }), ct);
 
                 if (choice == "Exit")
                     return;
@@ -45,11 +45,11 @@ namespace JonasTodoConsole.TuiView.ANSI
                 if (choice == "Add subtopic")
                 {
                     H3("Add new topic", false);
-                    var newSubtopic = await PromptForSubtopicDetails(dbContext.Topics);
+                    var newSubtopic = await PromptForSubtopicDetails(dbContext.Topics, ct);
                     if(newSubtopic != null)
                     {
                         dbContext.Add(newSubtopic);
-                        await dbContext.SaveChangesAsync();
+                        await dbContext.SaveChangesAsync(ct);
                     }
                     continue;
                 }
@@ -57,15 +57,15 @@ namespace JonasTodoConsole.TuiView.ANSI
                 if( choice == "Mark subtopic finished")
                 {
                     DisplayTable(subtopics.Where(s => s.Completed == false));
-                    var subtopicId = await AnsiConsole.PromptAsync<int>(new TextPrompt<int>("Enter the ID of the subtopic to mark as finished:").Validate(id =>
+                    var subtopicId = await AnsiConsole.PromptAsync(new TextPrompt<int>("Enter the ID of the subtopic to mark as finished:").Validate(id =>
                     {
                         return subtopics.Any(s => s.Id == id)
                             ? ValidationResult.Success()
                             : ValidationResult.Error("[red]Invalid subtopic ID.[/]");
-                    }));
+                    }), ct);
                     var subtopic = subtopics.First(s => s.Id == subtopicId);
                     subtopic.Completed = true;
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(ct);
                     continue;
                 }
 
@@ -73,42 +73,42 @@ namespace JonasTodoConsole.TuiView.ANSI
                 {
                     DisplayTable(subtopics.Where(s => s.Completed == true));
                     AnsiConsole.WriteLine("Press any key to return");
-                    System.Console.ReadKey();
+                    Console.ReadKey();
                 }
 
             } while (true);
         }
 
-        private async Task<Subtopic> PromptForSubtopicDetails(IEnumerable<Topic> topics)
+        private static async Task<Subtopic> PromptForSubtopicDetails(IEnumerable<Topic> topics, CancellationToken ct)
         {
-            var description = await AnsiConsole.PromptAsync<string>(new TextPrompt<string>("Description:").Validate(s =>
+            var description = await AnsiConsole.PromptAsync(new TextPrompt<string>("Description:").Validate(s =>
             {
                 return s.Length > 0 && s.Length <= 10
                     ? ValidationResult.Success()
                     : ValidationResult.Error("[red]Description must be between 1 and 10 characters.[/]");
-            }));
-            var longDescription = await AnsiConsole.PromptAsync<string>(new TextPrompt<string>("Long Description:").AllowEmpty());
-            var estimatedHours = await AnsiConsole.PromptAsync<int?>(new TextPrompt<int?>("Estimated Hours:").Validate(x =>
+            }), ct);
+            var longDescription = await AnsiConsole.PromptAsync(new TextPrompt<string>("Long Description:").AllowEmpty(), ct);
+            var estimatedHours = await AnsiConsole.PromptAsync(new TextPrompt<int?>("Estimated Hours:").Validate(x =>
             {
                 return x != null && new List<int> { 1, 2, 4, 8, 16, 32 }.Contains(x.Value)
                     ? ValidationResult.Success()
                     : ValidationResult.Error("[red]Estimated hours must be a power of 2 between 1,2,4,..,32[/]");
-            }).AllowEmpty());
+            }).AllowEmpty(), ct);
             var pluralsight = BooleanPrompt("Pluralsight course:", false);
             var completed = BooleanPrompt("Completed:", false);
-            var priority = await AnsiConsole.PromptAsync<int>(new TextPrompt<int>("Priority (1-5):").Validate(p =>
+            var priority = await AnsiConsole.PromptAsync(new TextPrompt<int>("Priority (1-5):").Validate(p =>
             {
                 return p >= 1 && p <= 5
                     ? ValidationResult.Success()
                     : ValidationResult.Error("[red]Priority must be between 1 and 5.[/]");
-            }));
+            }), ct);
             AnsiConsole.Markup("[italic]Topics[/]");
             TopicsTable.DisplayTable(topics);
-            var topic = await AnsiConsole.PromptAsync<Topic>(new SelectionPrompt<Topic>()
+            var topic = await AnsiConsole.PromptAsync(new SelectionPrompt<Topic>()
                 .Title("Select Topic:")
                 .PageSize(10)
                 .AddChoices(topics)
-                .UseConverter(t => t.Id.ToString()));
+                .UseConverter(t => t.Id.ToString()), ct);
             var subtopic = new Subtopic
             {
                 LoggedDate = DateOnly.FromDateTime(DateTime.Now),
@@ -121,7 +121,7 @@ namespace JonasTodoConsole.TuiView.ANSI
                 Priority = priority
             };
 
-            DisplayTable(new[] { subtopic });
+            DisplayTable([subtopic]);
             bool confirmation = BooleanPrompt("Confirm addition to table", true);
             if (confirmation)
                 return subtopic;
