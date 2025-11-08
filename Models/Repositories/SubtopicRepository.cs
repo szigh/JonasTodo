@@ -69,7 +69,7 @@ namespace DAL.Repositories
                     if (_env.IsDevelopment() && sw != null)
                     {
                         sw.Stop();
-                        _logger.LogInformation($"Streamed all Topics in {sw.ElapsedMilliseconds}");
+                        _logger.LogInformation($"Streamed all Subtopics in {sw.ElapsedMilliseconds}");
                     }
                 }
                 finally
