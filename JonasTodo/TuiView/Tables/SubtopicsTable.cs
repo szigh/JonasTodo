@@ -160,7 +160,7 @@ namespace JonasTodoConsole.TuiView.Tables
                 .AddColumn("Priority");
             if (subtopics != null)
             {
-                foreach (var subtopic in subtopics ?? new List<Subtopic>())
+                foreach (var subtopic in subtopics)
                 {
                     AddSubtopicToTable(table, subtopic);
                 }
