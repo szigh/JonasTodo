@@ -48,7 +48,7 @@ namespace DAL.Repositories
         public async Task<IEnumerable<Subtopic>> GetPredicatedAsync(Expression<Func<Subtopic, bool>> predicate,
             CancellationToken ct = default)
         {
-            using var ctx = _factory.CreateDbContext();
+            await using var ctx = _factory.CreateDbContext();
             return await ctx.Subtopics.AsNoTracking().Where(predicate).ToListAsync(ct);
         }
 
