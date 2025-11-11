@@ -23,7 +23,7 @@ namespace DAL.Repositories
         public async Task<Topic?> GetByIdAsync(int id, CancellationToken ct = default)
         {
             await using var ctx = _factory.CreateDbContext();
-            return await ctx.Topics.FindAsync([id], ct);
+            return await ctx.Topics.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, ct);
         }
 
         public async Task AddAsync(Topic topic, CancellationToken ct = default)
