@@ -34,7 +34,7 @@ namespace DAL.Repositories
 
         public async Task<Subtopic?> GetByIdAsync(int id)
         {
-            using var ctx = _factory.CreateDbContext();
+            await using var ctx = _factory.CreateDbContext();
             return await ctx.Subtopics.FindAsync(id);
         }
 
