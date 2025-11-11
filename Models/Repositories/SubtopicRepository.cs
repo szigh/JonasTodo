@@ -27,6 +27,7 @@ namespace DAL.Repositories
         {
             await using var ctx = _factory.CreateDbContext();
             return await ctx.Subtopics
+                .AsNoTracking()
                 .Include(s => s.Topic)
                 .SingleOrDefaultAsync(s => s.Id == id, ct);
         }
