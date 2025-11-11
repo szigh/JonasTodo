@@ -1,5 +1,4 @@
-﻿using DAL.Models;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace JonasTodoConsole
 {
@@ -12,12 +11,22 @@ namespace JonasTodoConsole
                 new Style(foreground: Color.Green, decoration: Decoration.Italic)));
         }
 
+        public static bool BooleanPrompt(string prompt, bool defaultValue)
+        {
+            return AnsiConsole.Prompt(
+                            new TextPrompt<bool>(prompt)
+                                .AddChoice(true)
+                                .AddChoice(false)
+                                .DefaultValue(defaultValue)
+                                .WithConverter(choice => choice ? "y" : "n"));
+        }
+
         internal static string GetStars(int number)
         {
-            const string starEmoji = "*";
+            string starEmoji = "*";
 
             //unknown why this doesn't work 
-            //const string starEmoji = Emoji.Known.Star;
+            //starEmoji = Emoji.Known.Star;
 
             var priorityStars = string.Empty;
             if (number > 0)

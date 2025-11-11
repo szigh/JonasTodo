@@ -1,17 +1,26 @@
 ﻿using Azure.Core;
 using Azure.Identity;
-using Core;
 using DAL;
-using DAL.Models;
 using JonasTodoConsole;
 using JonasTodoConsole.TuiView;
-using JonasTodoConsole.TuiView.Console;
-using Microsoft.EntityFrameworkCore;
+using JonasTodoConsole.TuiView.Tables;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 await Host.CreateDefaultBuilder(args)
+    .ConfigureLogging(logging =>
+    {
+        logging.AddSimpleConsole(options =>
+        {
+            options.TimestampFormat = "[HH:mm:ss] ";
+            options.ColorBehavior = LoggerColorBehavior.Enabled;
+            options.IncludeScopes = true;
+        });
+        logging.SetMinimumLevel(LogLevel.Debug);
+    })
     .ConfigureAppConfiguration((context, config) =>
     {
         var built = config.Build();
@@ -30,17 +39,13 @@ await Host.CreateDefaultBuilder(args)
     {
         // Using Azure KeyVault to manage secrets (connection strings)
         services.AddKeyVaultSecretHelper(context.Configuration["KeyVault:Endpoint"]!);
-        services.AddDbContextFactory<ToDoContext>(
-            options => options.UseSqlServer(context.Configuration.GetConnectionString("ToDoApp")));
-        services.Configure<DALSettings>(context.Configuration.GetSection(nameof(DALSettings)));
+        services.AddDALServices(context.Configuration);
 
-        services.AddDALServices();
-        services.AddCoreServices();
-
-        services.AddSingleton<IConsoleTablePresenter, ConsoleTablePresenter>();
         services.AddTransient<ISecretHelper, SecretHelper>();
 
-        services.AddSingleton<ConsoleMenu>();
+        services.AddTransient<ITopicsTable, TopicsTable>();
+        services.AddTransient<ISubtopicsTable, SubtopicsTable>();
+        services.AddScoped<ConsoleMenu>();
         services.AddHostedService<ConsoleMenuHostedService>();
     })
     .UseConsoleLifetime()
