@@ -43,7 +43,7 @@ namespace JonasTodoConsole.TuiView.Tables
                 if (choice == "Add topic")
                 {
                     H3("Add new topic", false);
-                    Topic entity = await PromptForTopicDetailsAsync(ct);
+                    Topic? entity = await PromptForTopicDetailsAsync(ct);
                     if (entity != null)
                     {
                         dbContext.Add(entity);

@@ -7,6 +7,14 @@
         "CONSOLE_LOG_LEVEL": "Debug"
       }
     },
+    DevelopLocalDb: {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "CONSOLE_LOG_LEVEL": "Debug"
+      },
+      "commandLineArgs": "--DAL:ConnectionStringName=ToDoAppLocal"
+    },
     "Release": {
       "commandName": "Project",
       "environmentVariables": {
