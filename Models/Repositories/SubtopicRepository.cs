@@ -40,7 +40,7 @@ namespace DAL.Repositories
 
         public async Task AddAsync(Subtopic subtopic)
         {
-            using var ctx = _factory.CreateDbContext();
+            await using var ctx = _factory.CreateDbContext();
             await ctx.Subtopics.AddAsync(subtopic);
             await ctx.SaveChangesAsync();
         }
