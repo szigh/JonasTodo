@@ -1,5 +1,6 @@
 using DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
@@ -8,14 +9,17 @@ namespace JonasTodoConsole.TuiView.Tables
     public class TopicsTable : ITopicsTable
     {
         private readonly IDbContextFactory<ToDoContext> _dbFactory;
+        private readonly ILogger<TopicsTable> _logger;
 
-        public TopicsTable(IDbContextFactory<ToDoContext> dbFactory)
+        public TopicsTable(IDbContextFactory<ToDoContext> dbFactory, ILogger<TopicsTable> logger)
         {
             _dbFactory = dbFactory;
+            _logger = logger;
         }
 
         public async Task RunAsync(CancellationToken ct = default)
         {
+            _logger.LogInformation("TopicsTable RunAsync started");
             AnsiConsole.Clear();
             AnsiConsole.MarkupLine(@"[green italic] _____           _          
 |_   _|__  _ __ (_) ___ ___ 
@@ -28,6 +32,7 @@ namespace JonasTodoConsole.TuiView.Tables
             AnsiConsole.WriteLine();
 
             var topics = await dbContext.Topics.ToListAsync(ct);
+            _logger.LogInformation("Loaded {Count} topics", topics.Count);
 
             do
             {
@@ -38,8 +43,13 @@ namespace JonasTodoConsole.TuiView.Tables
                 var choice = await AnsiConsole.PromptAsync(new SelectionPrompt<string>()
                     .AddChoices(new List<string>() { "Add topic", "Exit" }), ct);
 
+                _logger.LogInformation("User selected option: {Choice}", choice);
+
                 if (choice == "Exit")
+                {
+                    _logger.LogInformation("User exiting TopicsTable");
                     return;
+                }
                 if (choice == "Add topic")
                 {
                     H3("Add new topic", false);
@@ -48,6 +58,12 @@ namespace JonasTodoConsole.TuiView.Tables
                     {
                         dbContext.Add(entity);
                         await dbContext.SaveChangesAsync(ct);
+                        _logger.LogInformation("Added new topic with id {TopicId} and description '{Description}'", 
+                            entity.Id, entity.Description);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("User cancelled topic addition");
                     }
                 }
             } while (true);

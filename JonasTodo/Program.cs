@@ -8,18 +8,23 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
-        logging.AddSimpleConsole(options =>
-        {
-            options.TimestampFormat = "[HH:mm:ss] ";
-            options.ColorBehavior = LoggerColorBehavior.Enabled;
-            options.IncludeScopes = true;
-        });
-        logging.SetMinimumLevel(LogLevel.Debug);
+        // Clear default console logging providers
+        logging.ClearProviders();
+        
+        // Add log4net with configuration file
+        logging.AddLog4Net("log4net.config");
+        
+        // Set minimum level
+        logging.SetMinimumLevel(LogLevel.Information);
+        
+        // Disable or reduce EF Core logging
+        logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+        logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+        logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", LogLevel.Warning);
     })
     .ConfigureAppConfiguration((context, config) =>
     {
