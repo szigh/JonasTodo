@@ -45,7 +45,7 @@ namespace DAL.Repositories
             var ctx = _factory.CreateDbContext();
             await using (ctx.ConfigureAwait(false))
             {
-                var enumerator = ctx.Topics.AsAsyncEnumerable().GetAsyncEnumerator(ct);
+                var enumerator = ctx.Topics.AsNoTracking().AsAsyncEnumerable().GetAsyncEnumerator(ct);
                 try
                 {
                     while (await enumerator.MoveNextAsync())
