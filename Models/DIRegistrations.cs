@@ -1,4 +1,4 @@
-﻿using DAL.Caches;
+﻿//using DAL.Caches;
 using DAL.Models;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,7 @@ namespace DAL
             services.AddMemoryCache(); 
             services.AddScoped<ISubtopicRepository, SubtopicRepository>();
             services.AddScoped<ITopicRepository, TopicRepository>();
-            services.AddSingleton<ISubtopicCache, SubtopicCache>();
+            //services.AddSingleton<ISubtopicCache, SubtopicCache>();
             return services;
         }
 
