@@ -34,7 +34,7 @@ namespace JonasTodoConsole.TuiView.Tables
 |____/ \__,_|_.__/ \__\___/| .__/|_|\___|___/
                            |_|               [/]" + Environment.NewLine);
 
-            using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync(ct);
+            await using ToDoContext dbContext = await _dbFactory.CreateDbContextAsync(ct);
             AnsiConsole.WriteLine();
 
             do
