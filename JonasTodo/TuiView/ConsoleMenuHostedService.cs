@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DAL;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace JonasTodoConsole.TuiView
 {
@@ -9,15 +11,18 @@ namespace JonasTodoConsole.TuiView
         private readonly IServiceProvider _serviceProvider;
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ILogger<ConsoleMenuHostedService> _logger;
+        private readonly IOptions<DALSettings> _dalOptions;
 
         public ConsoleMenuHostedService(
             IServiceProvider serviceProvider,
             IHostApplicationLifetime appLifetime,
-            ILogger<ConsoleMenuHostedService> logger)
+            ILogger<ConsoleMenuHostedService> logger,
+            IOptions<DALSettings> dalOptions)
         {
             _serviceProvider = serviceProvider;
             _appLifetime = appLifetime ?? throw new ArgumentNullException(nameof(appLifetime));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dalOptions = dalOptions;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,7 +31,7 @@ namespace JonasTodoConsole.TuiView
 
             using var scope = _serviceProvider.CreateScope();
             var menu = scope.ServiceProvider.GetRequiredService<ConsoleMenu>();
-            var showTask = menu.ShowAsync(stoppingToken);
+            var showTask = menu.ShowAsync(stoppingToken, _dalOptions);
 
             // Wait for either the menu to finish or for cancellation to be requested.
             var finishedTask = await Task.WhenAny(showTask, Task.Delay(Timeout.Infinite, stoppingToken));

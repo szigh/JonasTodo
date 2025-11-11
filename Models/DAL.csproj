@@ -24,4 +24,9 @@
 		<PackageReference Include="Spectre.Console.Json" Version="0.53.0" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Folder Include="SQL\" />
+	</ItemGroup>
+
 </Project>
