@@ -56,30 +56,14 @@ namespace JonasTodoConsole.TuiView.Tables
                     var newSubtopic = await PromptSubtopic(ct);
                     if (newSubtopic != null)
                     {
-                        await _subtopicRepository.AddAsync(newSubtopic);
+                        await _subtopicRepository.AddAsync(newSubtopic, ct);
                     }
                     continue;
                 }
 
                 if (choice == "Mark subtopic finished")
                 {
-                    await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed != true, ct), ct: ct);
-                    Subtopic? st = null;
-                    do
-                    {
-                        var subtopicId = await AnsiConsole.PromptAsync(
-                            new TextPrompt<int>("Enter the ID of the subtopic to mark as finished (or -1 to cancel):"),
-                            ct);
-                        if (subtopicId == -1)
-                            goto cancel_mark_finished;
-                        st = await _subtopicRepository.GetByIdAsync(subtopicId);
-
-                    } while (st == null);
-
-                    st.Completed = true;
-                    await dbContext.SaveChangesAsync(ct);
-
-                cancel_mark_finished:
+                    await MarkSubtopicFinishedAsync(dbContext, ct);
                     continue;
                 }
 
@@ -91,6 +75,25 @@ namespace JonasTodoConsole.TuiView.Tables
                 }
 
             } while (true);
+        }
+
+        private async Task MarkSubtopicFinishedAsync(ToDoContext dbContext, CancellationToken ct)
+        {
+            await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed != true, ct), ct: ct);
+            Subtopic? st = null;
+            do
+            {
+                var subtopicId = await AnsiConsole.PromptAsync(
+                    new TextPrompt<int>("Enter the ID of the subtopic to mark as finished (or -1 to cancel):"),
+                    ct);
+                if (subtopicId == -1)
+                    return;
+                st = await _subtopicRepository.GetByIdAsync(subtopicId, ct);
+
+            } while (st == null);
+
+            st.Completed = true;
+            await dbContext.SaveChangesAsync(ct);
         }
 
         private async Task<Subtopic?> PromptSubtopic(CancellationToken ct)
@@ -125,7 +128,7 @@ namespace JonasTodoConsole.TuiView.Tables
             var subtopic = new Subtopic
             {
                 LoggedDate = DateOnly.FromDateTime(DateTime.Now),
-                Topic = topic,
+                TopicId = topic.Id,
                 Description = description,
                 LongDescription = longDescription,
                 EstimatedHours = estimatedHours,
@@ -134,7 +137,7 @@ namespace JonasTodoConsole.TuiView.Tables
                 Priority = priority
             };
 
-            await DisplayTable([subtopic]);
+            await DisplayTable([subtopic], ct: ct);
             bool confirmation = BooleanPrompt("Confirm addition to table", true);
             return confirmation ? subtopic : null;
         }
