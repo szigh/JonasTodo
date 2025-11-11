@@ -10,9 +10,21 @@ Logs are stored in:
 - **Windows**: `%LOCALAPPDATA%\JonasTodo\logs\`
 - **Linux/Mac**: `~/.local/share/JonasTodo/logs/`
 
+## Log Files
+
+The application creates two separate log files:
+
+1. **JonasTodo.log** - Main application logs
+   - All application events, user actions, and business logic
+   - **Filename pattern**: `JonasTodo-2025-11-11.log` (includes date)
+   
+2. **JonasTodo.EntityFramework.log** - Database logs
+   - Entity Framework Core logs (Warning level and above)
+   - Database queries and operations
+   - **Filename pattern**: `JonasTodo.EntityFramework-2025-11-11.log` (includes date)
+
 ## Log File Format
 
-- **Filename**: `JonasTodo.log` (with date-based rolling)
 - **Pattern**: Each log entry includes timestamp, thread ID, log level, logger name, and message
 - **Example**: `2025-11-11 16:33:23,447 [1] INFO  Program - Application started`
 
@@ -45,7 +57,7 @@ The logging system automatically manages log files with the following rules:
 - Warning when entities are not found
 
 ### EF Core Logging
-Entity Framework Core logging is reduced to WARNING level to minimize noise. Only significant database issues are logged.
+Entity Framework Core logging is reduced to WARNING level to minimize noise. Only significant database issues are logged. These logs are written to a separate file (`JonasTodo.EntityFramework.log`) to keep the main application log clean.
 
 ## Configuration
 

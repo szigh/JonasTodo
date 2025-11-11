@@ -25,14 +25,23 @@ Directory.CreateDirectory(logDirectory);
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly()!);
 XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-// Update the RollingFileAppender path
+// Update the RollingFileAppender paths
 foreach (var appender in logRepository.GetAppenders())
 {
     if (appender is RollingFileAppender rollingFileAppender)
     {
-        var logFilePath = Path.Combine(logDirectory, "JonasTodo.log");
-        rollingFileAppender.File = logFilePath;
-        rollingFileAppender.ActivateOptions();
+        if (rollingFileAppender.Name == "EntityFrameworkAppender")
+        {
+            var efLogFilePath = Path.Combine(logDirectory, "JonasTodo.EntityFramework.log");
+            rollingFileAppender.File = efLogFilePath;
+            rollingFileAppender.ActivateOptions();
+        }
+        else
+        {
+            var logFilePath = Path.Combine(logDirectory, "JonasTodo.log");
+            rollingFileAppender.File = logFilePath;
+            rollingFileAppender.ActivateOptions();
+        }
     }
 }
 
