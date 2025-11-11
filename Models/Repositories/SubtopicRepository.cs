@@ -18,6 +18,7 @@ namespace DAL.Repositories
         {
             await using var ctx = _factory.CreateDbContext();
             return await ctx.Subtopics
+                .AsNoTracking()
                 .Include(s => s.Topic)
                 .Where(s => s.TopicId == topicId)
                 .ToListAsync(cancellationToken: ct);
