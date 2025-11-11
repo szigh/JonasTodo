@@ -77,26 +77,35 @@ namespace JonasTodoConsole.TuiView.Tables
             } while (true);
         }
 
-        private async Task MarkSubtopicFinishedAsync(ToDoContext dbContext, CancellationToken ct)
+        private async Task MarkSubtopicFinishedAsync(ToDoContext dbContext, 
+            CancellationToken ct = default)
         {
-            await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed != true, ct), ct: ct);
+            await DisplayTable(await _subtopicRepository
+                .GetPredicatedAsync(s => s.Completed != true, ct), 
+                ct: ct);
             Subtopic? st = null;
             do
             {
                 var subtopicId = await AnsiConsole.PromptAsync(
                     new TextPrompt<int>("Enter the ID of the subtopic to mark as finished (or -1 to cancel):"),
                     ct);
+
                 if (subtopicId == -1)
                     return;
-                st = await _subtopicRepository.GetByIdAsync(subtopicId, ct);
 
+                st = await dbContext.Subtopics
+                    .FindAsync([subtopicId], 
+                    ct);
+
+                if (st == null)
+                    AnsiConsole.MarkupLine("[red]Subtopic not found. Please try again.[/]");
             } while (st == null);
 
             st.Completed = true;
             await dbContext.SaveChangesAsync(ct);
         }
 
-        private async Task<Subtopic?> PromptSubtopic(CancellationToken ct)
+        private async Task<Subtopic?> PromptSubtopic(CancellationToken ct = default)
         {
             var description = await AnsiConsole.PromptAsync(new TextPrompt<string>("Description:").Validate(s =>
             {
