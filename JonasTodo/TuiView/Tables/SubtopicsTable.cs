@@ -39,7 +39,7 @@ namespace JonasTodoConsole.TuiView.Tables
 
             do
             {
-                await DisplayTable(asyncSubtopics: _subtopicRepository.StreamAllAsync(ct), ct: ct);
+                await DisplayTable(_subtopicRepository.StreamAllAsync(ct), ct);
                 AnsiConsole.WriteLine();
 
                 AnsiConsole.MarkupLine("[green italic]Choose what to do next[/]");
@@ -69,7 +69,7 @@ namespace JonasTodoConsole.TuiView.Tables
 
                 if (choice == "Show completed subtopics")
                 {
-                    await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed == true, ct), ct: ct);
+                    await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed == true, ct), ct);
                     AnsiConsole.WriteLine("Press any key to return");
                     Console.ReadKey();
                 }
@@ -82,7 +82,7 @@ namespace JonasTodoConsole.TuiView.Tables
         {
             await DisplayTable(await _subtopicRepository
                 .GetPredicatedAsync(s => s.Completed != true, ct), 
-                ct: ct);
+                ct);
             Subtopic? st = null;
             do
             {
@@ -146,16 +146,38 @@ namespace JonasTodoConsole.TuiView.Tables
                 Priority = priority
             };
 
-            await DisplayTable([subtopic], ct: ct);
+            await DisplayTable([subtopic], ct);
             bool confirmation = BooleanPrompt("Confirm addition to table", true);
             return confirmation ? subtopic : null;
         }
 
-        private async static Task DisplayTable(IEnumerable<Subtopic>? subtopics = default,
-            IAsyncEnumerable<Subtopic>? asyncSubtopics = default,
+        private static Task DisplayTable(IEnumerable<Subtopic> subtopics, 
             CancellationToken ct = default)
         {
-            var table = new Table()
+            var table = CreateTable();
+            foreach (var subtopic in subtopics)
+            {
+                AddSubtopicToTable(table, subtopic);
+            }
+            AnsiConsole.Write(table);
+            return Task.CompletedTask;
+        }
+
+        private async static Task DisplayTable(IAsyncEnumerable<Subtopic> asyncSubtopics, 
+            CancellationToken ct = default)
+        {
+            var table = CreateTable();
+            await foreach (Subtopic subtopic in asyncSubtopics.WithCancellation(ct))
+            {
+                AddSubtopicToTable(table, subtopic);
+                await Task.Delay(100, ct);//for display effect
+            }
+            AnsiConsole.Write(table);
+        }
+
+        private static Table CreateTable()
+        {
+            return new Table()
                 .ShowRowSeparators()
                 .HeavyHeadBorder()
                 .AddColumn("ID")
@@ -167,22 +189,6 @@ namespace JonasTodoConsole.TuiView.Tables
                 .AddColumn("Pluralsight")
                 .AddColumn("Completed")
                 .AddColumn("Priority");
-            if (subtopics != null)
-            {
-                foreach (var subtopic in subtopics)
-                {
-                    AddSubtopicToTable(table, subtopic);
-                }
-            }
-            if (asyncSubtopics != null)
-            {
-                await foreach (Subtopic subtopic in asyncSubtopics.WithCancellation(ct))
-                {
-                    AddSubtopicToTable(table, subtopic);
-                    await Task.Delay(100, ct);//for display effect
-                }
-            }
-            AnsiConsole.Write(table);
         }
         static void AddSubtopicToTable(Table table, Subtopic subtopic)
         {
