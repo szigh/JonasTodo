@@ -7,7 +7,7 @@
         "CONSOLE_LOG_LEVEL": "Debug"
       }
     },
-    DevelopLocalDb: {
+    "DevelopLocalDb": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",

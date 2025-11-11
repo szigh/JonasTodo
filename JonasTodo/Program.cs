@@ -4,10 +4,37 @@ using DAL;
 using JonasTodoConsole;
 using JonasTodoConsole.TuiView;
 using JonasTodoConsole.TuiView.Tables;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
+
+// Configure log4net log file path to use LocalApplicationData
+var logDirectory = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "JonasTodo",
+    "logs");
+Directory.CreateDirectory(logDirectory);
+
+// Load log4net configuration and update file path
+var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly()!);
+XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+// Update the RollingFileAppender path
+foreach (var appender in logRepository.GetAppenders())
+{
+    if (appender is RollingFileAppender rollingFileAppender)
+    {
+        var logFilePath = Path.Combine(logDirectory, "JonasTodo.log");
+        rollingFileAppender.File = logFilePath;
+        rollingFileAppender.ActivateOptions();
+    }
+}
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
