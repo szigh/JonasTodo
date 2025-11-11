@@ -5,9 +5,9 @@ namespace DAL.Repositories
 {
     public interface ISubtopicRepository
     {
-        Task<List<Subtopic>> GetByTopicAsync(int topicId);
-        Task<Subtopic?> GetByIdAsync(int id);
-        Task AddAsync(Subtopic subtopic);
+        Task<List<Subtopic>> GetByTopicAsync(int topicId, CancellationToken ct = default);
+        Task<Subtopic?> GetByIdAsync(int id, CancellationToken ct = default);
+        Task AddAsync(Subtopic subtopic, CancellationToken ct = default);
         IAsyncEnumerable<Subtopic> StreamAllAsync(CancellationToken ct = default);
         Task<IEnumerable<Subtopic>> GetPredicatedAsync(Expression<Func<Subtopic, bool>> predicate, CancellationToken ct = default);
     }
