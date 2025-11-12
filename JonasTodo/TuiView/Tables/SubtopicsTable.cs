@@ -1,6 +1,7 @@
 using DAL.Models;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using static JonasTodoConsole.Extensions;
 
@@ -11,19 +12,23 @@ namespace JonasTodoConsole.TuiView.Tables
         private readonly IDbContextFactory<ToDoContext> _dbFactory;
         private readonly ISubtopicRepository _subtopicRepository;
         private readonly ITopicRepository _topicRepository;
+        private readonly ILogger<SubtopicsTable> _logger;
 
         public SubtopicsTable(IDbContextFactory<ToDoContext> dbFactory,
             ISubtopicRepository subtopicRepository,
-            ITopicRepository topicRepository
+            ITopicRepository topicRepository,
+            ILogger<SubtopicsTable> logger
             )
         {
             _dbFactory = dbFactory;
             _subtopicRepository = subtopicRepository;
             _topicRepository = topicRepository;
+            _logger = logger;
         }
 
         public async Task RunAsync(CancellationToken ct = default)
         {
+            _logger.LogInformation("SubtopicsTable RunAsync started");
             AnsiConsole.Clear();
 
             //https://www.asciiart.eu/text-to-ascii-art <- would be better to use a library or API
@@ -46,10 +51,15 @@ namespace JonasTodoConsole.TuiView.Tables
                 var choice = await AnsiConsole.PromptAsync(new SelectionPrompt<string>()
                     .AddChoices(new List<string>() { "Add subtopic", "Mark subtopic finished", "Show completed subtopics", "Exit" }), ct);
 
+                _logger.LogInformation("User selected option: {Choice}", choice);
+
                 H3(choice, false);
 
                 if (choice == "Exit")
+                {
+                    _logger.LogInformation("User exiting SubtopicsTable");
                     return;
+                }
 
                 if (choice == "Add subtopic")
                 {
@@ -57,6 +67,12 @@ namespace JonasTodoConsole.TuiView.Tables
                     if (newSubtopic != null)
                     {
                         await _subtopicRepository.AddAsync(newSubtopic, ct);
+                        _logger.LogInformation("Added new subtopic with id {SubtopicId} and description '{Description}'",
+                            newSubtopic.Id, newSubtopic.Description);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("User cancelled subtopic addition");
                     }
                     continue;
                 }
@@ -69,6 +85,7 @@ namespace JonasTodoConsole.TuiView.Tables
 
                 if (choice == "Show completed subtopics")
                 {
+                    _logger.LogInformation("Displaying completed subtopics");
                     await DisplayTable(await _subtopicRepository.GetPredicatedAsync(s => s.Completed == true, ct), ct);
                     AnsiConsole.WriteLine("Press any key to return");
                     Console.ReadKey();
@@ -80,6 +97,7 @@ namespace JonasTodoConsole.TuiView.Tables
         private async Task MarkSubtopicFinishedAsync(ToDoContext dbContext, 
             CancellationToken ct = default)
         {
+            _logger.LogInformation("MarkSubtopicFinishedAsync started");
             await DisplayTable(await _subtopicRepository
                 .GetPredicatedAsync(s => s.Completed != true, ct), 
                 ct);
@@ -91,18 +109,25 @@ namespace JonasTodoConsole.TuiView.Tables
                     ct);
 
                 if (subtopicId == -1)
+                {
+                    _logger.LogInformation("User cancelled marking subtopic as finished");
                     return;
+                }
 
                 st = await dbContext.Subtopics
                     .FindAsync([subtopicId], 
                     ct);
 
                 if (st == null)
+                {
+                    _logger.LogWarning("Subtopic with id {SubtopicId} not found", subtopicId);
                     AnsiConsole.MarkupLine("[red]Subtopic not found. Please try again.[/]");
+                }
             } while (st == null);
 
             st.Completed = true;
             await dbContext.SaveChangesAsync(ct);
+            _logger.LogInformation("Marked subtopic with id {SubtopicId} as completed", st.Id);
         }
 
         private async Task<Subtopic?> PromptSubtopic(CancellationToken ct = default)
