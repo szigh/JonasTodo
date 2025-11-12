@@ -1,0 +1,6 @@
+@JonasTodo.Api_HostAddress = http://localhost:5081
+
+GET {{JonasTodo.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

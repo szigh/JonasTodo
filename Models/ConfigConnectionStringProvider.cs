@@ -19,8 +19,8 @@ namespace DAL
 
             public string GetConnectionString()
             {
-                // Check runtime override first (allows env var or command-line to change the selection)
-                var key = _configuration["DAL:ConnectionStringName"] ?? _defaultName;
+                // Check runtime override first, then envvars/commandline, then default in configuration
+                var key = _selectedName ?? _configuration["DAL:ConnectionStringName"] ?? _defaultName;
 
                 //accesses Azure Key Vault to get the actual connection string
                 var connectionString = _configuration.GetConnectionString(key);

@@ -10,5 +10,7 @@ namespace DAL.Repositories
         Task AddAsync(Topic topic, CancellationToken ct = default);
         Task<IEnumerable<Topic>> GetPredicatedAsync(Expression<Func<Topic, bool>> predicate, CancellationToken ct = default);
         IAsyncEnumerable<Topic> StreamAllAsync(CancellationToken ct = default);
+        Task UpdateAsync(Topic topic, CancellationToken ct = default);
+        Task DeleteAsync(int id, CancellationToken ct = default);
     }
 }
