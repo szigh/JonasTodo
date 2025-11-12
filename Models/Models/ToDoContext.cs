@@ -22,7 +22,7 @@ public partial class ToDoContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new Configurations.SubtopicConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.TopicConfiguration());
-
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

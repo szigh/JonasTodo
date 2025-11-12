@@ -4,22 +4,63 @@ using DAL;
 using JonasTodoConsole;
 using JonasTodoConsole.TuiView;
 using JonasTodoConsole.TuiView.Tables;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+using System.Reflection;
+
+// Configure log4net log file path to use LocalApplicationData
+var logDirectory = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "JonasTodo",
+    "logs");
+Directory.CreateDirectory(logDirectory);
+
+// Load log4net configuration and update file path
+var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly()!);
+XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+// Update the RollingFileAppender paths
+foreach (var appender in logRepository.GetAppenders())
+{
+    if (appender is RollingFileAppender rollingFileAppender)
+    {
+        if (rollingFileAppender.Name == "EntityFrameworkAppender")
+        {
+            var efLogFilePath = Path.Combine(logDirectory, "JonasTodo.EntityFramework.log");
+            rollingFileAppender.File = efLogFilePath;
+            rollingFileAppender.ActivateOptions();
+        }
+        else
+        {
+            var logFilePath = Path.Combine(logDirectory, "JonasTodo.log");
+            rollingFileAppender.File = logFilePath;
+            rollingFileAppender.ActivateOptions();
+        }
+    }
+}
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
-        logging.AddSimpleConsole(options =>
-        {
-            options.TimestampFormat = "[HH:mm:ss] ";
-            options.ColorBehavior = LoggerColorBehavior.Enabled;
-            options.IncludeScopes = true;
-        });
-        logging.SetMinimumLevel(LogLevel.Debug);
+        // Clear default console logging providers
+        logging.ClearProviders();
+        
+        // Add log4net with configuration file
+        logging.AddLog4Net("log4net.config");
+        
+        // Set minimum level
+        logging.SetMinimumLevel(LogLevel.Information);
+        
+        // Disable or reduce EF Core logging
+        logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+        logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+        logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", LogLevel.Warning);
     })
     .ConfigureAppConfiguration((context, config) =>
     {

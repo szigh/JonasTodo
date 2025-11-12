@@ -1,26 +1,25 @@
 using Azure.Core;
 using Azure.Identity;
 using DAL;
+using JonasTodo.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load Key Vault (same pattern as console app)
-IHostBuilder hostBuilder = builder.Host.ConfigureAppConfiguration((context, config) =>
+var kvEndpoint = builder.Configuration["KeyVault:Endpoint"];
+if (!string.IsNullOrWhiteSpace(kvEndpoint))
 {
-    var built = config.Build();
-    var kvEndpoint = built["KeyVault:Endpoint"];
-    if (!string.IsNullOrWhiteSpace(kvEndpoint))
-    {
-        TokenCredential credential = context.HostingEnvironment.IsDevelopment() 
-            ? new InteractiveBrowserCredential() 
-            : new DefaultAzureCredential();
-        IConfigurationBuilder configurationBuilder = config.AddAzureKeyVault(new Uri(kvEndpoint), credential);
-    }
-});
+    TokenCredential credential = builder.Environment.IsDevelopment()
+        ? new InteractiveBrowserCredential()
+        : new DefaultAzureCredential();
+    builder.Configuration.AddAzureKeyVault(new Uri(kvEndpoint), credential);
+}
 
 // Register DAL and other services
 builder.Services.AddDALServices(builder.Configuration);
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantProvider, ClaimsTenantProvider>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
