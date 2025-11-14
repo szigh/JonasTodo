@@ -1,7 +1,6 @@
 using Azure.Core;
 using Azure.Identity;
 using DAL;
-using JonasTodo.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +18,6 @@ if (!string.IsNullOrWhiteSpace(kvEndpoint))
 builder.Services.AddDALServices(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ITenantProvider, ClaimsTenantProvider>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

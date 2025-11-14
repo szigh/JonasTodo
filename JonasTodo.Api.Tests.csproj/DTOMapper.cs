@@ -1,4 +1,5 @@
 using DAL.Models;
+using JonasTodo.Api.DTOs.Mappers;
 using Xunit;
 
 namespace JonasTodo.Api.Tests
@@ -50,7 +51,7 @@ namespace JonasTodo.Api.Tests
 
             var subDto = dto.Subtopics[0];
             Assert.Equal(sub.Id, subDto.Id);
-            Assert.Equal(topic.Description, subDto.topic);
+            Assert.Equal(topic.Description, subDto.Topic);
             Assert.Equal(sub.Description, subDto.Description);
             Assert.Equal(sub.LoggedDate, subDto.LoggedDate);
             Assert.Equal(sub.EstimatedHours, subDto.EstimatedHours);
@@ -78,7 +79,7 @@ namespace JonasTodo.Api.Tests
 
             // assert
             Assert.Equal(sub.Id, dto.Id);
-            Assert.Equal("ParentDesc", dto.topic);
+            Assert.Equal("ParentDesc", dto.Topic);
             Assert.Equal(sub.Description, dto.Description);
         }
 
